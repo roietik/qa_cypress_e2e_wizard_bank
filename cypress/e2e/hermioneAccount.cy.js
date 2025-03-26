@@ -3,9 +3,10 @@
 describe('Bank app', () => {
   const depositAmount = 2000;
   const withdrawAmount = 200;
-  let balance = 0;
+  let balance = 5096;
   const user = 'Hermoine Granger';
-  const accountNumber = '1001'; // Correct Account Number for Hermione
+  const firstAccountNumber = '1001';
+  const secoundAccountNumber = '1002';
 
   before(() => {
     cy.visit('/');
@@ -17,14 +18,9 @@ describe('Bank app', () => {
     cy.get('[name="userSelect"]').select(user);
     cy.contains('.btn', 'Login').click();
 
-    // reset table
-    cy.get('[ng-click="transactions()"]').click();
-    cy.contains('.btn', 'Reset').click();
-    cy.contains('.btn', 'Back').click();
-
     // // Assert Account Number, Balance, and Currency
     cy.contains('[ng-hide="noAccount"]', 'Account Number')
-      .contains('strong', accountNumber)
+      .contains('strong', firstAccountNumber)
       .should('be.visible');
     cy.contains('[ng-hide="noAccount"]', 'Balance')
       .contains('strong', String(balance))
@@ -66,22 +62,24 @@ describe('Bank app', () => {
 
     cy.contains('.btn', 'Back').click();
     cy.get('[ng-click="transactions()"]').click();
-    cy.reload();
     cy.get('table tbody').should('be.visible');
+    cy.contains('a', 'Date-Time').should('be.visible');
+    cy.contains('a', 'Date-Time').click({ force: true });
+
     cy.get('table tbody tr:nth-child(1) td:nth-child(2)')
-      .should('contain', 2000);
+      .should('contain', withdrawAmount);
     cy.get('table tbody tr:nth-child(1) td:nth-child(3)')
-      .should('contain', 'Credit');
-    cy.get('table tbody tr:nth-child(2) td:nth-child(2)')
-      .should('contain', 200);
-    cy.get('table tbody tr:nth-child(2) td:nth-child(3)')
       .should('contain', 'Debit');
+    cy.get('table tbody tr:nth-child(2) td:nth-child(2)')
+      .should('contain', depositAmount);
+    cy.get('table tbody tr:nth-child(2) td:nth-child(3)')
+      .should('contain', 'Credit');
 
     // // Back
     cy.get('[ng-click="back()"]').click();
 
     // // Change Account Number
-    cy.get('[name="accountSelect"]').select('1002');
+    cy.get('[name="accountSelect"]').select(secoundAccountNumber);
     cy.get('[ng-click="transactions()"]').click();
     cy.get('table tbody tr').should('have.length', 0);
 
